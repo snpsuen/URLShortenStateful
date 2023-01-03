@@ -48,8 +48,8 @@ def shortenurl():
     
 @app.route('/<shortpath>')
 def travel(shortpath):
-    democlient = pymongo.MongoClient("mongodb://mongodemo:mongodemo@mongodemo-service:27017")
-    demodb = democlient['demo']
+    democlient = pymongo.MongoClient("mongodb://mongostate:mongostate@mongostate-0.mongostate-headless.default.svc.cluster.local:27017")
+    demodb = democlient['statetest']
     democollect = demodb['urlmap']
     
     query = {}
