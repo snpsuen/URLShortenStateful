@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongostate
+spec:
+  serviceName: mongostate-headless
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mongostate
+  template:
+    metadata:
+      labels:
+        app: mongostate
+    spec:
+      initContainers:
+      - name: keyfile-prep
+        image: busybox
+        volumeMounts:
+        - name: mongostate-secvol
+          mountPath: /etc/mongosecret
+        - name: mongosecret-varvol
+          mountPath: /var/mongosecret
+          readOnly: false
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+            cp /etc/mongosecret/keyfile /var/mongosecret/keyfile &&
+            chmod 400 /var/mongosecret/keyfile &&
+            chown 999:999 /var/mongosecret/keyfile &&
+            sleep 5
+      containers:
+      - image: mongo:latest
+        name: mongostate-container
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-init-secret
+              key: username         
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-init-secret
+              key: password
+        - name: MONGO_INITDB_ROOT_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mongo-init-secret
+              key: database
+        - name: TEST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-init-secret
+              key: testpassword         
+        volumeMounts:
+        - name: mongostate-cfvol
+          mountPath: /docker-entrypoint-initdb.d
+        - name: mongosecret-varvol
+          mountPath: /var/mongosecret
+        args: [ "mongod", "--replSet", "RepSet", "--keyFile", "/var/mongosecret/keyfile" ]
+      volumes:
+      - name: mongostate-cfvol
+        configMap:
+          name: mongostate-configmap
+          defaultMode: 0755
+      - name: mongostate-secvol
+        secret:
+          secretName: mongostate-secret
+      - name: mongosecret-varvol
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongostate-headless
+  labels:
+    app: mongostate
+spec:
+  selector:
+    app: mongostate
+  ports:
+  - name: service
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  clusterIP: None
