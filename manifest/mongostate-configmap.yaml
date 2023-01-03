@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongostate-configmap
+data:
+  mongostate-init.sh: |
+    #!/bin/bash
+    mongosh <<EOF
+      db = db.getSiblingDB('statetest')
+      db.createUser({
+        user: 'tester',
+        pwd: '$TEST_PASSWORD',
+        roles: [{ role: 'readWrite', db: 'testing' }],
+      });
+      db.createCollection('urlmap')
+    EOF
