@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: urlshortendb-deployment
+  labels:
+    app: urlshortendb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: urlshortendb
+  template:
+    metadata:
+      labels:
+        app: urlshortendb
+    spec:
+      containers:
+      - name: urlshortendb
+        image: snpsuen/urlshortendb:v1
+        # imagePullPolicy: Never
+        ports:
+        - containerPort: 5005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: urlshortendb-service
+spec:
+  selector:
+    app: urlshortendb
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5005
+  type: LoadBalancer
