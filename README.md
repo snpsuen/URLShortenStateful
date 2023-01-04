@@ -28,4 +28,8 @@ The frontend service is normally assigned an external IP and hostname, which wil
 
 (4) The service is now ready to go. Just land in the frontend service home page via its external IP or NodePort, enter a desirable URL and test it out.
 
+![URL shortner input page](urlshortenstateful_screen_cut01.jpg.jpg)
 
+![URL shortner output page](urlshortenstateful_screen_cut02.jpg.jpg)
+
+Click at the shorten link to verify redirection to the original URL.
