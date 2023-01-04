@@ -20,7 +20,7 @@ kubectl apply -f https://raw.githubusercontent.com/snpsuen/URLShortenStateful/ma
 kubectl apply -f https://raw.githubusercontent.com/snpsuen/URLShortenStateful/main/manifest/mongostate-stateful-service.yaml
 ~~~
 
-(3) Deploy a K83 service for the frontend Flask application from this repo, which is based on the docker image built in Step 1.
+(3) Wait for the mongo dayabase replicas to come up. After that, deploy a K83 service for the frontend Flask application from this repo, which is based on the docker image built in Step 1.
 ~~~
 kubectl apply -f https://raw.githubusercontent.com/snpsuen/URLShortenStateful/main/manifest/urlshortenstateful-deployment-service.yaml
 ~~~
